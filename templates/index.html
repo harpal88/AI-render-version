@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login and Upload Image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        .input-field {
+            margin-bottom: 40px;
+        }
+
+        .button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .loading {
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .image-container {
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .image-container img {
+            max-width: 100px;
+            border-radius: 5px;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button id="loginBtn" class="button">Login</button>
+        <div id="loadingText" class="loading" style="display: none;">first time login will take some time.....................Logging in, please wait... </div><br><br>
+
+        <!-- Image Upload Input -->
+        <div class="input-field">
+            <label for="imageUpload">Upload Image:</label><br>
+            <input type="file" id="imageUpload" accept="image/*">
+            <br>
+            <img id="imagePreview" alt="Image Preview" style="max-width: 100px; display: none;">
+        </div>
+
+        <!-- Buttons for generating images -->
+        <div class="button-row">
+            <button id="button1" class="button" disabled>Smiling</button>
+            <button id="button2" class="button" disabled>Laughing</button>
+            <button id="button3" class="button" disabled>Surprised</button>
+            <button id="button4" class="button" disabled>Sad</button>
+            <button id="button5" class="button" disabled>Mad</button>
+            <button id="button6" class="button" disabled>Afraid</button>
+        </div>
+
+        <h3>Generated Images:</h3>
+        <div class="image-list" id="imageContainer"></div>
+
+        <!-- Success message for video processing -->
+        <div id="videoSuccessMessage" style="display: none; color: green; margin-top: 20px;">...........................
+           plese do not leave refresh ,in 10 seconds image will be updated...................................................
+        </div>
+    </div>
+    <script>
+       window.onload = async () => {
+            // Get the logged-in status from the data attribute
+            const loggedIn = document.querySelector('.button-row').dataset.loggedIn === 'true';  // Convert to boolean
+            const buttons = document.querySelectorAll('.button-row button');
+            
+            // Enable or disable buttons based on login status
+            buttons.forEach(btn => {
+                btn.disabled = !loggedIn; // Disable button if not logged in
+            });
+            document.getElementById('loginBtn').disabled = loggedIn; // Disable login button if logged in
+
+            await fetchAndDisplayImages();  // Fetch the images on page load
+        };
+    </script>
+  
+    
+    <script>
+const prompts = {
+    "1": "consistent character, smiling warmly, relaxed expression, white background",
+    "2": "consistent character, laughing with joy, eyes slightly closed, cheerful expression, white background",
+    "3": "consistent character, surprised, wide eyes, mouth slightly open, raised eyebrows, white background",
+    "4": "consistent character, sad, downturned eyes, slight frown, solemn expression, white background",
+    "5": "consistent character, angry, furrowed brows, tense expression, clenched jaw, white background",
+    "6": "consistent character, afraid, wide eyes, nervous look, slightly tense face, white background"
+};
+
+
+        // Event listeners for buttons
+        for (let i = 1; i <= 6; i++) {
+    document.getElementById(`button${i}`).addEventListener('click', async () => await handleButtonClick(i.toString()));
+}
+
+async function handleButtonClick(buttonNumber) {
+    const file = document.getElementById('imageUpload').files[0];
+    const prompt = prompts[buttonNumber];
+    
+    // Get all buttons
+    const buttons = document.querySelectorAll('button[id^="button"]');
+    
+    if (!file || !prompt) {
+        alert('Please select an image and ensure the prompt is set.');
+        return;
+    }
+
+    // Disable all buttons to prevent multiple clicks
+    buttons.forEach(button => button.disabled = true);
+    
+    try {
+        await uploadImageAndCreateImage(file, prompt);
+        document.getElementById('videoSuccessMessage').style.display = 'block';  // Show success message
+        await fetchAndDisplayImages();  // Fetch the updated image list after creation
+    } catch (error) {
+        alert(`Error generating image ${buttonNumber}: ${error.message}`);
+    } finally {
+        // Re-enable all buttons after processing
+        buttons.forEach(button => button.disabled = false);
+    }
+}
+
+// Check login status on page load
+ 
+
+
+
+
+
+let isLoggedIn = false;
+
+window.onload = async () => {
+    const loggedIn = await checkLoginStatus();  // Check the login status from the server
+    isLoggedIn = loggedIn;  // Set the login state to the returned value
+    updateButtonStates();  // Update button states based on the variable
+    await fetchAndDisplayImages();  // Fetch the images on page load
+};
+
+async function checkLoginStatus() {
+    const response = await fetch('/check_login');  // Create a new endpoint to check login status
+    const data = await response.json();
+    return data.logged_in;  // Return true or false based on the login status
+}
+
+function updateButtonStates() {
+    const buttons = document.querySelectorAll('.button-row button');
+    buttons.forEach(btn => {
+        btn.disabled = !isLoggedIn; // Enable buttons if logged in
+    });
+    document.getElementById('loginBtn').disabled = isLoggedIn; // Disable login button if logged in
+}
+
+
+document.getElementById('loginBtn').addEventListener('click', async function () {
+    document.getElementById('loadingText').style.display = 'block';
+    try {
+        const response = await loginToBackend();
+        alert(response);
+
+        // Set the login state to true
+        isLoggedIn = true;
+        // Update button states
+        updateButtonStates();
+    } catch (error) {
+        alert('Login failed: ' + error.message);
+    } finally {
+        document.getElementById('loadingText').style.display = 'none';
+    }
+});
+
+async function loginToBackend() {
+    const response = await fetch('/login', { method: 'POST' });
+    const data = await response.json();
+    if (response.ok) {
+        return data.message;
+    } else {
+        throw new Error(data.message);
+    }
+}
+
+
+        async function uploadImageAndCreateImage(file, prompt) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('prompt', prompt);
+
+            const response = await fetch('/upload', { method: 'POST', body: formData });
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message);
+            }
+        }
+
+        // Fetch and display images on page load
+        window.onload = async () => {
+            await fetchAndDisplayImages();
+        };
+
+        async function fetchAndDisplayImages() {
+            try {
+                const response = await fetch('/list_images');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch images');
+                }
+                const data = await response.json();
+                const imageContainer = document.getElementById('imageContainer');
+                imageContainer.innerHTML = '';  // Clear previous images
+
+                data.images.forEach(imageUrl => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imgElement.alt = 'Generated Image';
+                    imgElement.style.width = '100px';  // Adjust size as needed
+                    imgElement.style.margin = '10px';   // Add some margin
+                    imageContainer.appendChild(imgElement);
+                });
+            } catch (error) {
+                console.error('Error fetching images:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+/venv
+/myenv
+myenv/
+venv/
+venv
+myenv
+instance/output_folder/*
+instance/results/*.mp4
+instance/uploads/*.png
