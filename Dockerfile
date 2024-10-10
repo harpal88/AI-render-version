@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     libu2f-udev \
     xdg-utils \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,10 +47,10 @@ COPY . .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create necessary directories for uploads, output, and results (if not present)
+# Create necessary directories for uploads, output, and results
 RUN mkdir -p /app/instance/uploads /app/instance/output_folder /app/instance/results
 
-# Set permissions (Optional, depends on how you manage these directories)
+# Set permissions
 RUN chmod -R 755 /app/instance
 
 # Expose the port Flask will run on
