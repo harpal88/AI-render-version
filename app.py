@@ -35,20 +35,30 @@ driver = None
 # Setup the WebDriver
 def setup_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Make Chrome run in headless mode
-    chrome_options.add_argument("--no-sandbox")  # Recommended for headless mode in some environments
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Recommended to avoid issues with shared memory
+
+    # Specify the path to the Chrome binary, as the system may look for Chromium by default.
+    chrome_options.binary_location = "/usr/bin/google-chrome"
+
+    # Add necessary Chrome options for running in headless mode
+    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    chrome_options.add_argument("--no-sandbox")  # Recommended for running as root in containers
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration (optional)
-    
+    chrome_options.add_argument("--disable-extensions")  # Disable extensions (optional)
+    chrome_options.add_argument("--window-size=1920,1080")  # Set window size (optional but useful for consistency)
+
+    # Set download preferences
     prefs = {
-        "download.default_directory": app.config['VIDEO_OUTPUT_FOLDER'],  # Set video download directory
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing.enabled": True,
-        "profile.default_content_setting_values.notifications": 2,
-        "profile.content_settings.exceptions.automatic_downloads.*.setting": 1
+        "download.default_directory": app.config['VIDEO_OUTPUT_FOLDER'],  # Set the folder for downloads
+        "download.prompt_for_download": False,  # Do not prompt for downloads
+        "download.directory_upgrade": True,  # Allow directory changes without user input
+        "safebrowsing.enabled": True,  # Enable safe browsing
+        "profile.default_content_setting_values.notifications": 2,  # Block notifications
+        "profile.content_settings.exceptions.automatic_downloads.*.setting": 1  # Allow automatic downloads
     }
     chrome_options.add_experimental_option("prefs", prefs)
+
+    # Create the WebDriver using ChromeDriver and options
     return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
 
 
