@@ -75,8 +75,12 @@
 
     <div class="container">
         <button id="loginBtn" class="button">Login</button>
-        <div id="loadingText" class="loading" style="display: none;">first time login will take some time.....................Logging in, please wait... </div><br><br>
 
+        <div id="loadingText" class="loading" style="display: none;">
+            first time login will take some time..until see these results
+            <br><br>
+            <img src="a.png" alt="Loading preview" style="width: 1000px; height: auto;" />        </div>
+        
         <!-- Image Upload Input -->
         <div class="input-field">
             <label for="imageUpload">Upload Image:</label><br>
@@ -100,7 +104,7 @@
 
         <!-- Success message for video processing -->
         <div id="videoSuccessMessage" style="display: none; color: green; margin-top: 20px;">...........................
-           if image is not updated ..please do not leave refresh ,in 10 seconds image will be updated...................................................
+           plese do not leave refresh ,in 10 seconds image will be updated...................................................
         </div>
     </div>
     <script>
@@ -195,7 +199,9 @@ function updateButtonStates() {
 
 
 document.getElementById('loginBtn').addEventListener('click', async function () {
+    // Show the loading text and image
     document.getElementById('loadingText').style.display = 'block';
+
     try {
         const response = await loginToBackend();
         alert(response);
@@ -207,9 +213,11 @@ document.getElementById('loginBtn').addEventListener('click', async function () 
     } catch (error) {
         alert('Login failed: ' + error.message);
     } finally {
+        // Hide the loading text and image
         document.getElementById('loadingText').style.display = 'none';
     }
 });
+
 
 async function loginToBackend() {
     const response = await fetch('/login', { method: 'POST' });
