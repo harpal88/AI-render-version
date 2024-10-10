@@ -55,4 +55,4 @@ RUN chmod -R 755 /app/instance
 EXPOSE $PORT
 
 # Start the app using Flask's run command
-CMD ["flask", "run", "--host=0.0.0.0", "--port=$PORT"]
+CMD ["sh", "-c", "flask run --host=0.0.0.0 --port=${PORT}"]
