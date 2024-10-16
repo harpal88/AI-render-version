@@ -39,13 +39,16 @@ def setup_driver():
     # Specify the path to the Chrome binary, as the system may look for Chromium by default.
     chrome_options.binary_location = "/usr/bin/google-chrome"
 
-    # Add necessary Chrome options for running in headless mode
-    chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+    # Enable headless mode for running in Docker or headless servers
+    chrome_options.add_argument("--headless")  # Uncomment this for Docker or servers
+
     chrome_options.add_argument("--no-sandbox")  # Recommended for running as root in containers
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Useful for debugging, but optional
+
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
     chrome_options.add_argument("--disable-gpu")  # Disable GPU hardware acceleration (optional)
     chrome_options.add_argument("--disable-extensions")  # Disable extensions (optional)
-    chrome_options.add_argument("--window-size=1920,1080")  # Set window size (optional but useful for consistency)
+    chrome_options.add_argument("--window-size=1920,1080")  # Set window size (optional)
 
     # Set download preferences
     prefs = {
@@ -59,7 +62,9 @@ def setup_driver():
     chrome_options.add_experimental_option("prefs", prefs)
 
     # Create the WebDriver using ChromeDriver and options
-    return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
+    chrome_service = ChromeService(ChromeDriverManager().install(), log_path='/path/to/chromedriver.log')  # Optional logging
+
+    return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 
 @app.route('/')

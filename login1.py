@@ -11,8 +11,8 @@ from selenium.webdriver.chrome.options import Options
 
 # Constants for Vidu and Tutanota credentials
 VIDU_LOGIN_URL = 'https://www.vidu.studio/login'
-TUTANOTA_EMAIL = 'freelancehp@tutamail.com'
-TUTANOTA_PASSWORD = '5fU7VGL5DsBm65P'
+TUTANOTA_EMAIL = 'harpalsinh798@tutamail.com'
+TUTANOTA_PASSWORD = 'WyF2b7QytJwfv4p'
 
 # def close_notification_if_present(driver):
 #     try:
