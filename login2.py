@@ -26,17 +26,17 @@ def close_notification_if_present(driver):
     except Exception as e:
         print(f"Error while checking for close button: {e}")
 
-# Function to click "Create Video" link
 def click_create_video_link(driver):
     try:
-        create_video_link = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, '//a[@href="/create" and contains(text(), "Create Video")]'))
+        create_video_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, '.group.inline-flex.h-10.w-max.items-center.justify-center.rounded-10.py-2.font-medium.transition-colors'))
         )
-        create_video_link.click()
-        print("Clicked 'Create Video' link.")
+        create_video_button.click()
+        print("Clicked 'Create Video' button.")
         time.sleep(5)  # Wait for the page to load
     except Exception as e:
-        print(f"Error clicking 'Create Video' link: {e}")
+        print(f"Error clicking 'Create Video' button: {e}")
+
 
 # Function to enter the prompt
 def enter_prompt(driver, prompt):
@@ -64,10 +64,13 @@ def upload_file(driver, file_path):
         # Proceed with file upload
         for attempt in range(3):  # Try up to 3 times
             try:
+                # Locate the file input within the specific class structure
                 file_input = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, 'input[type="file"][accept="image/jpeg, image/png"]'))
+                    EC.presence_of_element_located(
+                        (By.CSS_SELECTOR, 'div.relative.flex input[type="file"][accept="image/jpeg,image/png,image/webp"]')
+                    )
                 )
-                file_input.send_keys(file_path)
+                file_input.send_keys(file_path)  # Upload the file
                 print(f"Uploaded file: {file_path}")
                 return  # Exit after successful upload
             except StaleElementReferenceException:
@@ -76,7 +79,6 @@ def upload_file(driver, file_path):
         print("Failed to upload file after multiple attempts.")
     except Exception as e:
         print(f"Error while uploading file: {e}")
-
 
 
 from selenium.webdriver.common.by import By
