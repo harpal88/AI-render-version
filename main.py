@@ -75,10 +75,12 @@ def login_to_vidu(driver):
                 {
                     "domain": ".vidu.studio",
                     "name": "JWT",
-                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjk3OTMwODMsImlhdCI6MTcyODQ5NzA4MywiaXNzIjoiaWFtIiwic3ViIjoiMjQ2ODI0NzYzNzU5OTI1NiJ9.urEITHxlk1x-jIvyeNf3KaxP01r39uHofgqSZAdT2kU",
+                    "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzA0Mzg4MjEsImlhdCI6MTcyOTE0MjgyMSwiaXNzIjoiaWFtIiwic3ViIjoiMjQ3ODk5Nzg1NzIyMzY4NCJ9.TjderPzUewofXus-PvOOYrxb4JM8DU5oFd2-NMoa5YE",
                     "path": "/",
                     "httpOnly": True,
-                    "secure": True
+                    "secure": True,
+                    "sameSite": "no_restriction",
+                    "expirationDate": 1730438821.636391
                 },
                 {
                     "domain": ".vidu.studio",
@@ -86,17 +88,29 @@ def login_to_vidu(driver):
                     "value": "",
                     "path": "/",
                     "httpOnly": True,
-                    "secure": True
+                    "secure": True,
+                    "sameSite": "no_restriction",
+                    "expirationDate": 1730438821.636508
                 }
             ]
 
             # Loop through the cookies and add them to the browser
             for cookie in cookies:
-                driver.add_cookie(cookie)
+                cookie_data = {
+                    "name": cookie["name"],
+                    "value": cookie["value"],
+                    "domain": cookie["domain"],
+                    "path": cookie["path"],
+                    "secure": cookie["secure"],
+                    "httpOnly": cookie["httpOnly"],
+                    "expiry": int(cookie["expirationDate"])  # Convert to integer
+                }
+                
+                driver.add_cookie(cookie_data)
 
-            # Refresh the page to apply cookies
+            # Refresh to apply cookies
             driver.refresh()
-            print("Cookies added and page refreshed.")
+
 
             # Verify login by checking if cookies are now present
             driver.implicitly_wait(10)  # Adjust wait time as needed
